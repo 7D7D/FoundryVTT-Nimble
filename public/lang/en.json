@@ -730,6 +730,10 @@
 				"reach": "Reach",
 				"range": "Range"
 			}
+		},
+		"compendium": {
+			"filterSpells": "Filter Spells",
+			"filterAll": "All"
 		}
 	}
 }
