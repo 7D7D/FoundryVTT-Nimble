@@ -122,6 +122,7 @@
 		"vitest": "^4.0.8"
 	},
 	"dependencies": {
+		"@league-of-foundry-developers/foundry-vtt-types": "^13.340.1",
 		"picomatch": "^4.0.3",
 		"svelte": "^5.42.2",
 		"svelte-preprocess": "^6.0.3",
