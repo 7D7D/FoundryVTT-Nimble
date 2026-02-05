@@ -90,6 +90,8 @@
   bottom: calc(
     var(--nimble-actor-image-safe-bottom, 0) - var(--nimble-wound-button-padding, 0)
   );
+  width: var(--nimble-wounds-safe-width, 2rem);
+  max-width: var(--nimble-wounds-safe-width, 2rem);
   height: auto;
   max-height: none;
   transform: none;
