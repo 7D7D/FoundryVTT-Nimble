@@ -90,3 +90,23 @@
     }
   }
 }
+
+.system-nimble .nimble-sheet--player-character .nimble-icon--actor {
+  --nimble-actor-image-safe-top: var(
+    --nimble-actor-image-safe-top-override,
+    calc(var(--header-height, 30px) + 0.25rem)
+  );
+  --nimble-actor-image-safe-right: 0.25rem;
+  --nimble-actor-image-safe-bottom: var(--nimble-actor-image-safe-bottom-override, 2.5rem);
+  --nimble-actor-image-safe-left: calc(
+    var(--nimble-wounds-left, 0.25rem) + var(--nimble-wounds-safe-width, 2rem)
+  );
+}
+
+.system-nimble .nimble-sheet--player-character .nimble-icon__button--actor,
+.system-nimble .nimble-sheet--player-character .nimble-icon__button--actor:focus,
+.system-nimble .nimble-sheet--player-character .nimble-icon__button--actor:hover {
+  box-sizing: border-box;
+  padding: var(--nimble-actor-image-safe-top, 0) var(--nimble-actor-image-safe-right, 0)
+    var(--nimble-actor-image-safe-bottom, 0) var(--nimble-actor-image-safe-left, 0);
+}

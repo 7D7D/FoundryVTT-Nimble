@@ -2,17 +2,18 @@
 .nimble-sheet .nimble-wounds-list {
   position: absolute;
   top: 50%;
-  left: 0.625rem;
+  left: var(--nimble-wounds-left, 0.625rem);
   display: flex;
   flex-direction: column-reverse;
   flex-wrap: wrap;
   margin: 0;
   padding: 0;
-  height: 10.5rem;
+  height: auto;
+  max-height: var(--nimble-wounds-max-height, calc(100% - 0.5rem));
   width: fit-content;
-  max-width: calc(100% - 1.25rem);
+  max-width: calc(100% - 0.5rem);
   background: transparent;
-  transform: translateY(-55%);
+  transform: translateY(-50%);
   z-index: 2;
   pointer-events: none;
   overflow: hidden;
@@ -27,9 +28,9 @@
     display: flex;
     opacity: var(--nimble-wound-button-opacity, 0);
     margin: 0;
-    padding: 0.375rem;
+    padding: var(--nimble-wound-button-padding, 0.375rem);
     width: fit-content;
-    font-size: var(--nimble-md-text);
+    font-size: var(--nimble-wound-button-size, var(--nimble-md-text));
     color: #303030;
     -webkit-text-stroke: 1px #acacac;
     border: 0;
@@ -80,4 +81,22 @@
   &__item {
     display: contents;
   }
+}
+
+.system-nimble .nimble-sheet--player-character .nimble-wounds-list {
+  top: calc(
+    var(--nimble-actor-image-safe-top, 0) - var(--nimble-wound-button-padding, 0)
+  );
+  bottom: calc(
+    var(--nimble-actor-image-safe-bottom, 0) - var(--nimble-wound-button-padding, 0)
+  );
+  height: auto;
+  max-height: none;
+  transform: none;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding-block: var(--nimble-wounds-padding-block, 0);
 }
