@@ -94,6 +94,13 @@
 
 	&--player-character {
 		--nimble-sheet-sidebar-width: 3rem;
+		--nimble-wounds-left: 0.125rem;
+		--nimble-wounds-safe-width: 1.6rem;
+		--nimble-wound-button-padding: 0.25rem;
+		--nimble-wounds-padding-block: 0.5rem;
+		--nimble-header-control-size: 1.5rem;
+		--nimble-actor-image-safe-top-override: calc(var(--nimble-header-control-size) + 0.75rem);
+		--nimble-actor-image-safe-bottom-override: 0.25rem;
 
 		--nimble-content-grid-areas: "header sidebar" "primaryNavigation sidebar" "secondaryNavigation sidebar"
 			"static sidebar" "body sidebar" "footer sidebar";
@@ -128,8 +135,17 @@
 			}
 
 			.window-header {
-				padding-inline-end: 0.5rem;
+				padding-inline-end: 0.25rem;
 				margin-inline-end: 3rem;
+
+				.header-control {
+					width: var(--nimble-header-control-size);
+					height: var(--nimble-header-control-size);
+					min-width: var(--nimble-header-control-size);
+					line-height: 1;
+					padding: 0.125rem;
+					font-size: 0.75rem;
+				}
 			}
 
 			.window-resize-handle {

@@ -268,6 +268,7 @@
 		<ul
 			class="nimble-wounds-list"
 			class:nimble-wounds-list--centered={wounds.max > 9 && wounds.max % 6 >= 3}
+			style={`--nimble-wounds-count: ${Math.max(1, wounds.max)};`}
 		>
 			{#each { length: wounds.max }, i}
 				<li class="nimble-wounds-list__item">
@@ -607,7 +608,7 @@
 				'manaHeading manaHeading'
 				'manaBar manaBar';
 			grid-gap: 0 0.125rem;
-			margin-block-start: -2.25rem;
+			margin-block-start: 0.25rem;
 			margin-inline: 0.25rem;
 		}
 	}
