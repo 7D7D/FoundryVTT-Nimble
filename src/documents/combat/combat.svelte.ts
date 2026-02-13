@@ -8,7 +8,16 @@ interface CombatantSystemWithActions {
 			current: number;
 			max: number;
 		};
+		heroic?: {
+			interposeAvailable?: boolean;
+			defendAvailable?: boolean;
+		};
 	};
+}
+
+function getCombatantTypePriority(combatant: Combatant.Implementation): number {
+	if (combatant.type === 'character') return 0;
+	return 1;
 }
 
 class NimbleCombat extends Combat {
@@ -101,6 +110,8 @@ class NimbleCombat extends Combat {
 			const system = combatant.system as unknown as CombatantSystemWithActions;
 			await combatant.update({
 				'system.actions.base.current': system.actions.base.max,
+				'system.actions.heroic.defendAvailable': true,
+				'system.actions.heroic.interposeAvailable': true,
 			} as Record<string, unknown>);
 		}
 	}
@@ -161,12 +172,13 @@ class NimbleCombat extends Combat {
 		for await (const [i, id] of combatantIds.entries()) {
 			// Get Combatant data (non-strictly)
 			const combatant = this.combatants.get(id);
-			const combatantUpdates: Record<string, unknown> = { _id: id, initiative: 0 };
+			const combatantUpdates: Record<string, unknown> = { _id: id };
 			if (!combatant?.isOwner) continue;
 
 			// Produce an initiative roll for the Combatant
 			const roll = combatant.getInitiativeRoll(formula ?? undefined);
 			await roll.evaluate();
+			combatantUpdates.initiative = roll.total ?? 0;
 
 			if (combatant.type === 'character') {
 				const actionPath = 'system.actions.base.current';
@@ -175,6 +187,9 @@ class NimbleCombat extends Combat {
 				if (total >= 20) combatantUpdates[actionPath] = 3;
 				else if (total >= 10) combatantUpdates[actionPath] = 2;
 				else combatantUpdates[actionPath] = 1;
+
+				combatantUpdates['system.actions.heroic.defendAvailable'] = true;
+				combatantUpdates['system.actions.heroic.interposeAvailable'] = true;
 			}
 
 			updates.push(combatantUpdates);
@@ -228,10 +243,20 @@ class NimbleCombat extends Combat {
 	}
 
 	override _sortCombatants(a: Combatant.Implementation, b: Combatant.Implementation): number {
-		const sa = (a.system as unknown as { sort: number }).sort;
-		const sb = (b.system as unknown as { sort: number }).sort;
+		const typePriorityDiff = getCombatantTypePriority(a) - getCombatantTypePriority(b);
+		if (typePriorityDiff !== 0) return typePriorityDiff;
 
-		return sa - sb;
+		const initiativeA = Number(a.initiative ?? Number.NEGATIVE_INFINITY);
+		const initiativeB = Number(b.initiative ?? Number.NEGATIVE_INFINITY);
+		const initiativeDiff = initiativeB - initiativeA;
+		if (initiativeDiff !== 0) return initiativeDiff;
+
+		const sa = (a.system as unknown as { sort?: number }).sort ?? 0;
+		const sb = (b.system as unknown as { sort?: number }).sort ?? 0;
+		const manualSortDiff = sa - sb;
+		if (manualSortDiff !== 0) return manualSortDiff;
+
+		return (a.name ?? '').localeCompare(b.name ?? '');
 	}
 
 	async _onDrop(event: DragEvent & { target: EventTarget & HTMLElement }) {

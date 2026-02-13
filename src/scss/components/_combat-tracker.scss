@@ -146,6 +146,22 @@
   &__item {
     display: contents;
   }
+
+  &__dead-divider {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 0.5rem 0 0.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--nimble-combat-tracker-border-color);
+  }
+
+  &__dead-label {
+    font-size: var(--nimble-xs-text);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--nimble-medium-text-color);
+  }
 }
 
 .nimble-combatant {
@@ -170,6 +186,10 @@
 
   &--active {
     border-color: var(--color-border-highlight);
+  }
+
+  &--dead {
+    border-style: dashed;
   }
 
   &__header {
@@ -224,6 +244,7 @@
 
   &__image-wrapper {
     --nimble-combatant-controls-overlay-display: none;
+    position: relative;
 
     height: 94px;
     border-block-end: 1px solid var(--color-border-dark-1);
@@ -236,17 +257,52 @@
       --nimble-combatant-controls-overlay-display: block;
     }
   }
+
+  &__dead-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.35));
+    z-index: 1;
+  }
+
+  &__dead-overlay-x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1;
+    color: hsla(0, 80%, 70%, 90%);
+    text-shadow:
+      0 0 6px rgba(0, 0, 0, 0.85),
+      0 0 12px rgba(0, 0, 0, 0.65);
+  }
 }
 
 .nimble-combatant-actions {
   display: flex;
-  justify-content: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
   padding-block-end: 0.375rem;
   font-size: var(--nimble-xs-text);
 
   &--disabled {
     pointer-events: none;
+  }
+
+  &__top-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
   }
 
   &__initiative-button {
@@ -262,6 +318,46 @@
     }
   }
 
+  &__defend-button {
+    --nimble-icon-color: var(--nimble-combat-tracker-text-color);
+
+    transition: var(--nimble-standard-transition);
+
+    &:hover {
+      --nimble-icon-color: var(--nimble-combat-tracker-hover-color);
+      box-shadow: none;
+      text-shadow: 0 0 8px var(--nimble-combat-tracker-hover-color);
+    }
+
+    &--used {
+      --nimble-icon-color: hsl(0, 66%, 53%);
+      opacity: 0.85;
+    }
+  }
+
+  &__end-turn-button {
+    width: calc(100% - 0.5rem);
+    margin-top: 0.125rem;
+    padding: 0.125rem 0.375rem;
+    font-size: inherit;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--nimble-combat-tracker-text-color);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--nimble-combat-tracker-border-color);
+    border-radius: 0.375rem;
+    box-shadow: var(--nimble-box-shadow);
+    transition: var(--nimble-standard-transition);
+
+    &:hover,
+    &:focus {
+      color: var(--nimble-combat-tracker-hover-color);
+      border-color: var(--nimble-combat-tracker-hover-color);
+      box-shadow: 0 0 8px var(--nimble-combat-tracker-hover-color);
+      text-shadow: none;
+    }
+  }
+
   &__initiative-icon {
     margin: 0;
     padding: 0;
@@ -270,7 +366,16 @@
     transition: var(--nimble-standard-transition);
   }
 
+  &__defend-icon {
+    margin: 0;
+    padding: 0;
+    font-size: var(--nimble-sm-text);
+    color: var(--nimble-icon-color);
+    transition: var(--nimble-standard-transition);
+  }
+
   &__initiative-button,
+  &__defend-button,
   &__pip-button {
     display: flex;
     align-items: center;

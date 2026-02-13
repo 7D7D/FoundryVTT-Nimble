@@ -6,6 +6,7 @@ import init from './hooks/init.js';
 import ready from './hooks/ready.js';
 import renderChatMessageHTML from './hooks/renderChatMessage.js';
 import renderNimbleTokenHUD from './hooks/renderNimbleTokenHUD.js';
+import registerCombatantDefeatSync from './hooks/combatantDefeatSync.js';
 import setup from './hooks/setup.js';
 import './scss/main.scss';
 import { injectViteHmrClient } from './utils/viteHmr.js';
@@ -48,6 +49,7 @@ type HookFn = (...args: object[]) => undefined | boolean | Promise<undefined | b
 );
 
 Hooks.on('hotbarDrop', onHotbarDrop);
+registerCombatantDefeatSync();
 
 // Refresh tokens when combat ends to remove turn indicators
 Hooks.on('deleteCombat', () => {

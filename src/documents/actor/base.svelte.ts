@@ -36,6 +36,9 @@ interface BaseActorSystemData {
 			max: number;
 			temp: number;
 		};
+		armor?: {
+			value?: number;
+		};
 		sizeCategory?: string;
 		initiative?: {
 			mod: number;
@@ -267,6 +270,48 @@ class NimbleBaseActor<ActorType extends SystemActorTypes = SystemActorTypes> ext
 		// TODO: Add cascading numbers
 
 		// TODO: Call Hook
+		await this.update(updates);
+	}
+
+	async applyDamage(
+		damage: number,
+		options: { ignoreArmor?: boolean; outcome?: string } = {},
+	): Promise<void> {
+		const systemData = this.system as unknown as BaseActorSystemData;
+		const hp = systemData.attributes.hp;
+		if (!hp) return;
+
+		const outcome = options.outcome;
+		if (outcome === 'noDamage') return;
+
+		let remainingDamage = Math.max(0, Math.floor(Number(damage) || 0));
+		if (remainingDamage <= 0) return;
+
+		const ignoreArmor = options.ignoreArmor ?? false;
+		const armorValue = Number(systemData.attributes.armor?.value ?? 0);
+		if (!ignoreArmor && armorValue > 0) {
+			remainingDamage = Math.max(0, remainingDamage - armorValue);
+		}
+		if (remainingDamage <= 0) return;
+
+		let tempHp = Math.max(0, Number(hp.temp ?? 0));
+		let hpValue = Math.max(0, Number(hp.value ?? 0));
+
+		if (tempHp > 0) {
+			const absorbedByTempHp = Math.min(tempHp, remainingDamage);
+			tempHp -= absorbedByTempHp;
+			remainingDamage -= absorbedByTempHp;
+		}
+
+		if (remainingDamage > 0) {
+			hpValue = Math.max(0, hpValue - remainingDamage);
+		}
+
+		const updates: Record<string, unknown> = {
+			'system.attributes.hp.temp': tempHp,
+			'system.attributes.hp.value': hpValue,
+		};
+
 		await this.update(updates);
 	}
 

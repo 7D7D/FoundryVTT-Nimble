@@ -28,13 +28,22 @@
 	async function toggleCombatantDefeatedState(event) {
 		event.preventDefault();
 
-		combatant.update({ defeated: !combatant.defeated });
+		const nextDefeated = !combatant.defeated;
+		const updates = {
+			defeated: nextDefeated,
+		};
+
+		if (nextDefeated) {
+			updates['system.actions.base.current'] = 0;
+		}
+
+		combatant.update(updates);
 
 		const defeatedId = CONFIG.specialStatusEffects.DEFEATED;
 
 		await combatant.actor?.toggleStatusEffect(defeatedId, {
 			overlay: true,
-			active: !combatant.defeated,
+			active: nextDefeated,
 		});
 	}
 
@@ -85,11 +94,17 @@
 	let { active, children = undefined, combatant } = $props();
 
 	let isObserver = combatant?.actor?.testUserPermission(game.user, 'OBSERVER');
+	let isDead = $derived(
+		combatant.reactive?.defeated ||
+			(combatant.type !== 'character' &&
+				(combatant.actor?.reactive?.system?.attributes?.hp?.value ?? 1) <= 0),
+	);
 </script>
 
 <article
 	class="nimble-combatant"
 	class:nimble-combatant--active={active}
+	class:nimble-combatant--dead={isDead}
 	data-combatant-id={combatant._id}
 	onmouseenter={(event) => handleTokenHighlight(event, 'enter')}
 	onmouseleave={(event) => handleTokenHighlight(event, 'leave')}
@@ -110,6 +125,11 @@
 			src={combatant.reactive?.img ?? 'icons/svg/mystery-man.svg'}
 			alt="Combatant art"
 		/>
+		{#if isDead}
+			<div class="nimble-combatant__dead-overlay" aria-hidden="true">
+				<span class="nimble-combatant__dead-overlay-x">X</span>
+			</div>
+		{/if}
 
 		<div class="nimble-combatant-controls-overlay">
 			<div class="nimble-combatant-controls-overlay__column">

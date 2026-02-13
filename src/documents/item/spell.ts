@@ -39,6 +39,9 @@ export class NimbleSpellItem extends NimbleBaseItem {
 			return null;
 		}
 
+		const didSpendActions = await this.spendCombatActionsForActivationCost();
+		if (!didSpendActions) return null;
+
 		// Deduct mana for tiered spells (cantrips are free)
 		if (this.system.tier > 0 && this.actor) {
 			// Use upcast amount if available, otherwise use base tier cost

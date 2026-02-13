@@ -18,6 +18,21 @@ interface NimbleBaseActor extends Actor {
 interface BaseItemSystemData {
 	identifier?: string;
 	macro?: string;
+	activation?: {
+		cost?: {
+			quantity?: number;
+			type?: string;
+			isReaction?: boolean;
+		};
+	};
+}
+
+interface CombatantSystemWithActions {
+	actions?: {
+		base?: {
+			current?: number;
+		};
+	};
 }
 
 /**
@@ -164,6 +179,10 @@ class NimbleBaseItem<ItemType extends SystemItemTypes = SystemItemTypes> extends
 		if (activation === null || rolls === null) {
 			return null;
 		}
+
+		const didSpendActions = await this.spendCombatActionsForActivationCost();
+		if (!didSpendActions) return null;
+
 		const { isCritical, isMiss } = rolls.find((roll) => roll instanceof DamageRoll) ?? {};
 
 		const chatData = foundry.utils.mergeObject(
@@ -199,6 +218,31 @@ class NimbleBaseItem<ItemType extends SystemItemTypes = SystemItemTypes> extends
 
 		const chatCard = await ChatMessage.create(chatData as unknown as ChatMessage.CreateData);
 		return chatCard ?? null;
+	}
+
+	protected async spendCombatActionsForActivationCost(): Promise<boolean> {
+		const actionCost = this.#getActionCostFromActivation();
+		if (actionCost <= 0) return true;
+
+		const combatant = this.#getActorCombatantForCurrentScene();
+		if (!combatant || combatant.initiative === null) return true;
+
+		const combatantSystem = combatant.system as CombatantSystemWithActions;
+		const currentActions = Number(combatantSystem.actions?.base?.current ?? 0);
+
+		if (!Number.isFinite(currentActions)) return true;
+		if (currentActions < actionCost) {
+			ui.notifications?.warn(
+				`${this.actor?.name ?? 'Actor'} does not have enough actions remaining for ${this.name}.`,
+			);
+			return false;
+		}
+
+		await combatant.update({
+			'system.actions.base.current': currentActions - actionCost,
+		} as Record<string, unknown>);
+
+		return true;
 	}
 
 	/** Override in subclasses to add custom chat card data */
@@ -237,6 +281,41 @@ class NimbleBaseItem<ItemType extends SystemItemTypes = SystemItemTypes> extends
 	/** ------------------------------------------------------ */
 	/**                         Etc                            */
 	/** ------------------------------------------------------ */
+	#getActionCostFromActivation(): number {
+		const systemData = this.system as unknown as BaseItemSystemData;
+		const cost = systemData.activation?.cost;
+		if (!cost || cost.isReaction) return 0;
+		if (cost.type !== 'action') return 0;
+
+		const quantity = Number(cost.quantity ?? 0);
+		if (!Number.isFinite(quantity) || quantity <= 0) return 0;
+
+		return Math.floor(quantity);
+	}
+
+	#getActorCombatantForCurrentScene(): Combatant.Implementation | null {
+		const actorId = this.actor?.id;
+		if (!actorId) return null;
+
+		const sceneId = canvas.scene?.id;
+		const candidates = [game.combat, game.combats?.viewed, ...(game.combats?.contents ?? [])];
+		const visitedCombatIds = new Set<string>();
+
+		for (const combat of candidates) {
+			if (!combat || visitedCombatIds.has(combat.id)) continue;
+			visitedCombatIds.add(combat.id);
+
+			if (sceneId && combat.scene?.id !== sceneId) continue;
+
+			const combatant = combat.combatants.find(
+				(c) => c.actorId === actorId && (!sceneId || c.sceneId === sceneId),
+			);
+
+			if (combatant) return combatant;
+		}
+
+		return null;
+	}
 
 	/** ------------------------------------------------------ */
 	/**                  Lifecycle Hooks                       */

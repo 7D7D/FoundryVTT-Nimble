@@ -14,4 +14,9 @@ export const targets = () => ({
 		nullable: false,
 		initial: [],
 	}),
+	defendChoices: new fields.ObjectField({
+		required: true,
+		nullable: false,
+		initial: {},
+	}),
 });
