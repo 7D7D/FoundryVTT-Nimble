@@ -1,0 +1,38 @@
+{
+	"id": "enhancedcombathud-nimble",
+	"title": "Argon - Combat HUD (Nimble)",
+	"description": "Nimble integration for Enhanced Combat HUD (Argon), including hero actions, heroic reactions, and class feature support.",
+	"version": "0.1.0",
+	"authors": [
+		{
+			"name": "Nimble Foundry Contributors"
+		}
+	],
+	"compatibility": {
+		"minimum": "13",
+		"verified": "13",
+		"maximum": "13"
+	},
+	"relationships": {
+		"requires": [
+			{
+				"id": "enhancedcombathud",
+				"type": "module",
+				"compatibility": {
+					"minimum": "3.1.0"
+				}
+			}
+		],
+		"systems": [
+			{
+				"id": "nimble",
+				"type": "system",
+				"compatibility": {
+					"minimum": "0.7.0"
+				}
+			}
+		]
+	},
+	"esmodules": ["index.js"],
+	"styles": ["styles/module.css"]
+}
